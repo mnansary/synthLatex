@@ -1,0 +1,2 @@
+# Python dependencies
+pillow>=9.0.0  # image manipulation in the future
