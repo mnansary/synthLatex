@@ -1,0 +1,18 @@
+{
+  "user": [
+    "How many countries are related to the Bengali language?",
+"So what kind of language is related to the Bengali language?",
+"This is very interesting! In which other countries is the Bengali language located?"
+  ],
+  "response": [
+    "There are 10 countries with the Bengali language. Such as: Bangladesh, India, United Kingdom, United States, Pakistan, Oman, Indonesia, Brunei, Malaysia, and Singapore.",
+"Indo-Aryan languages.",
+"Bangla language has a unique position, occupying the fourth and top position, respectively, as a mother tongue and in written form, according to the world's population."
+  ],
+  "intents": [
+    "language.countries.count",
+    "language.relation",
+    "language.location"
+  ],
+  "num_entries": 3
+}
