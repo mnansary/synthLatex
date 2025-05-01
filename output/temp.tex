@@ -1,0 +1,21 @@
+
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{array}
+\usepackage{booktabs}
+
+\begin{document}
+\section*{Data Table from JSON}
+\begin{tabular}{|p{4cm}|p{6cm}|p{3cm}|}
+\hline
+\textbf{User Query} & \textbf{Response} & \textbf{Intent} \\
+\hline
+How many countries are related to the Bengali language? & There are 10 countries with the Bengali language. Such as: Bangladesh, India, United Kingdom, United States, Pakistan, Oman, Indonesia, Brunei, Malaysia, and Singapore. & language.countries.count \\
+\hline
+So what kind of language is related to the Bengali language? & Indo-Aryan languages. & language.relation \\
+\hline
+This is very interesting! In which other countries is the Bengali language located? & Bangla language has a unique position, occupying the fourth and top position, respectively, as a mother tongue and in written form, according to the world's population. & language.location \\
+\hline
+\end{tabular}
+
+\end{document}

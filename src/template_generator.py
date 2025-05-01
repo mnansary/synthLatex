@@ -1,5 +1,26 @@
 import random
 import argparse
+import os
+import json
+from tqdm import tqdm
+
+def load_texts_from(dir_path):
+    texts = []
+    for fname in os.listdir(dir_path):
+        if not fname.endswith(".json"):
+            continue
+        path = os.path.join(dir_path, fname)
+        with open(path, encoding="utf-8") as f:
+            obj = json.load(f)
+        # type-2 file: has "text"
+        if "text" in obj:
+            texts.append(obj["text"])
+        # type-1 file: has lists of user/responses
+        else:
+            texts.extend(obj.get("response", []))
+            # if you also want questions:
+            # texts.extend(obj.get("user", []))
+    return texts
 
 def apply_text_style(text_placeholder):
     """Apply random text styles 50% of the time; otherwise, return plain text."""
@@ -18,152 +39,152 @@ def apply_text_style(text_placeholder):
     ]
     return random.choice(styles)
 
-def generate_random_template(output_path):
+def generate_random_template(output_path, text_pool):
     """Generate a random LaTeX template with at least 50 structures and 30 base templates."""
     structures = [
     # 1-3: Headings
-    r"\section{{{}}}".format(apply_text_style("{TEXT_HERE}")),
-    r"\subsection{{{}}}".format(apply_text_style("{TEXT_HERE}")),
-    r"\subsubsection{{{}}}".format(apply_text_style("{TEXT_HERE}")),
+    r"\section{{{}}}".format(apply_text_style(random.choice(text_pool))),
+    r"\subsection{{{}}}".format(apply_text_style(random.choice(text_pool))),
+    r"\subsubsection{{{}}}".format(apply_text_style(random.choice(text_pool))),
 
     # 4-8: Lists
     r"\begin{{itemize}}\n    \item {{{}}}\n    \item {{{}}}\n\end{{itemize}}".format(
-        apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}")
+        apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool))
     ),
     r"\begin{{enumerate}}\n    \item {{{}}}\n    \item {{{}}}\n\end{{enumerate}}".format(
-        apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}")
+        apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool))
     ),
     r"\begin{{description}}\n    \item[{{{}}}] {{{}}}\n\end{{description}}".format(
-        apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}")
+        apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool))
     ),
     r"\begin{{itemize}}\n    \item {{{}}}\n    \begin{{enumerate}}\n        \item {{{}}}\n    \end{{enumerate}}\n\end{{itemize}}".format(
-        apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}")
+        apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool))
     ),
     r"\begin{{enumerate}}\n    \item {{{}}}\n    \begin{{itemize}}\n        \item {{{}}}\n    \end{{itemize}}\n\end{{enumerate}}".format(
-        apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}")
+        apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool))
     ),
 
     # 9-15: Tables
     r"\begin{{tabular}}{{|c|c|}}\n\hline\n    {{{}}} & {{{}}} \\\\\n\hline\n\end{{tabular}}".format(
-        apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}")
+        apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool))
     ),
     r"\begin{{tabular}}{{||l|r||}}\n\hline\n    {{{}}} & {{{}}} \\\\\n    {{{}}} & {{{}}} \\\\\n\hline\n\end{{tabular}}".format(
-        apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}"),
-        apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}")
+        apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool)),
+        apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool))
     ),
     r"\begin{{tabular}}{{|c|c|c|}}\n\hline\n    {{{}}} & {{{}}} & {{{}}} \\\\\n\hline\n\end{{tabular}}".format(
-        apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}")
+        apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool))
     ),
     r"\begin{{table}}[h]\n\centering\n    \begin{{tabular}}{{|c|c|}}\n    \hline\n        {{{}}} & {{{}}} \\\\\n    \hline\n    \end{{tabular}}\n    \caption{{{}}}\n\end{{table}}".format(
-        apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}")
+        apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool))
     ),
     r"\begin{{table}}[h]\n\centering\n    \begin{{tabular}}{{|c|c|c|}}\n    \hline\n        \multicolumn{{2}}{{|c|}}{{{}}} & {{{}}} \\\\\n    \hline\n        {{{}}} & {{{}}} & {{{}}} \\\\\n    \hline\n    \end{{tabular}}\n\end{{table}}".format(
-        apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}"),
-        apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}")
+        apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool)),
+        apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool))
     ),
     r"\begin{{tabular}}{{|c|c|c|}}\n\hline\n    \multirow{{2}}{{*}}{{{}}} & {{{}}} & {{{}}} \\\\\n    \cline{{2-3}}\n     & {{{}}} & {{{}}} \\\\\n\hline\n\end{{tabular}}".format(
-        apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}"),
-        apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}")
+        apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool)),
+        apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool))
     ),
     r"\begin{{tabular}}{{|l|c|r|}}\n\hline\n    {{{}}} & \multicolumn{{2}}{{|c|}}{{{}}} \\\\\n\hline\n    {{{}}} & {{{}}} & {{{}}} \\\\\n\hline\n\end{{tabular}}".format(
-        apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}"),
-        apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}")
+        apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool)),
+        apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool))
     ),
 
     # 16-22: Equations
-    r"Equation: ${{{}}}$".format(apply_text_style("{TEXT_HERE}")),
-    r"Equation: $\frac{{{}}}{{{}}}$".format(apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}")),
-    r"Equation: ${{}} = {{}}$".format(apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}")),
+    r"Equation: ${{{}}}$".format(apply_text_style(random.choice(text_pool))),
+    r"Equation: $\frac{{{}}}{{{}}}$".format(apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool))),
+    r"Equation: ${{}} = {{}}$".format(apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool))),
     r"\begin{{equation}}\n    {{{}}} = {{{}}}^2\n\end{{equation}}".format(
-        apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}")
+        apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool))
     ),
     r"\begin{{equation}}\n    \sqrt{{{}}} = {{{}}}\n\end{{equation}}".format(
-        apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}")
+        apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool))
     ),
     r"\begin{{align}}\n    {{{}}} &= {{{}}} \\\\\n    {{{}}} &= {{{}}}\n\end{{align}}".format(
-        apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}"),
-        apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}")
+        apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool)),
+        apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool))
     ),
     r"\begin{{align*}}\n    {{{}}} + {{{}}} &= {{{}}} \\\\\n    {{{}}} &= \int {{{}}} \,dx\n\end{{align*}}".format(
-        apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}"),
-        apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}")
+        apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool)),
+        apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool))
     ),
 
     # 23-27: Multi-column layouts
     r"\begin{{multicols}}{{2}}\n    {{{}}}\n    \columnbreak\n    {{{}}}\n\end{{multicols}}".format(
-        apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}")
+        apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool))
     ),
     r"\begin{{multicols}}{{3}}\n    {{{}}}\n    \columnbreak\n    {{{}}}\n    \columnbreak\n    {{{}}}\n\end{{multicols}}".format(
-        apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}")
+        apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool))
     ),
     r"\begin{{multicols}}{{2}}\n    {{{}}}\n    \begin{{itemize}}\n        \item {{{}}}\n    \end{{itemize}}\n    \columnbreak\n    {{{}}}\n\end{{multicols}}".format(
-        apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}")
+        apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool))
     ),
     r"\begin{{multicols}}{{2}}\n    {{{}}}\n    \begin{{tabular}}{{|c|}}\n    \hline\n        {{{}}}\n    \hline\n    \end{{tabular}}\n    \columnbreak\n    {{{}}}\n\end{{multicols}}".format(
-        apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}")
+        apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool))
     ),
     r"\begin{{multicols}}{{3}}\n    {{{}}}\n    \columnbreak\n    {{{}}}\n    \begin{{equation}}\n        {{{}}}\n    \end{{equation}}\n    \columnbreak\n    {{{}}}\n\end{{multicols}}".format(
-        apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}")
+        apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool))
     ),
 
     # 28-35: Nested structures
     r"\section{{{}}}\n    {{{}}}".format(
-        apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}")
+        apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool))
     ),
     r"\section{{{}}}\n    \begin{{itemize}}\n        \item {{{}}}\n    \end{{itemize}}".format(
-        apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}")
+        apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool))
     ),
     r"\subsection{{{}}}\n    \begin{{tabular}}{{|c|c|}}\n    \hline\n        {{{}}} & {{{}}} \\\\\n    \hline\n    \end{{tabular}}".format(
-        apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}")
+        apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool))
     ),
     r"\begin{{center}}\n    {{{}}}\n    \begin{{equation}}\n        {{{}}} = {{{}}}\n    \end{{equation}}\n\end{{center}}".format(
-        apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}")
+        apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool))
     ),
     r"\begin{{itemize}}\n    \item {{{}}}\n    \begin{{align}}\n        {{{}}} &= {{{}}}\n    \end{{align}}\n\end{{itemize}}".format(
-        apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}")
+        apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool))
     ),
     r"\begin{{tabular}}{{|c|}}\n\hline\n    {{{}}}\n    \begin{{itemize}}\n        \item {{{}}}\n    \end{{itemize}}\n\hline\n\end{{tabular}}".format(
-        apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}")
+        apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool))
     ),
     r"\section{{{}}}\n\begin{{center}}\n    {{{}}}\n\end{{center}}".format(
-        apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}")
+        apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool))
     ),
     r"\begin{{description}}\n    \item[{{{}}}] {{{}}}\n    \begin{{equation}}\n        {{{}}}\n    \end{{equation}}\n\end{{description}}".format(
-        apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}")
+        apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool))
     ),
 
     # 36-40: Figures and boxes
     r"\begin{{figure}}[h]\n\centering\n    \fbox{{{}}}\n    \caption{{{}}}\n\end{{figure}}".format(
-        apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}")
+        apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool))
     ),
     r"\begin{{figure}}[h]\n\centering\n    {{{}}}\n    \caption{{{}}}\n\end{{figure}}".format(
-        apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}")
+        apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool))
     ),
-    r"\fbox{{{}}}".format(apply_text_style("{TEXT_HERE}")),
+    r"\fbox{{{}}}".format(apply_text_style(random.choice(text_pool))),
     r"\framebox{{{}}}\n{{{}}}".format(
-        apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}")
+        apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool))
     ),
-    r"\begin{{center}}\n    \fbox{{{}}}\n\end{{center}}".format(apply_text_style("{TEXT_HERE}")),
+    r"\begin{{center}}\n    \fbox{{{}}}\n\end{{center}}".format(apply_text_style(random.choice(text_pool))),
 
     # 41-45: Theorem-like environments
-    r"\begin{{theorem}}\n    {{{}}}\n\end{{theorem}}".format(apply_text_style("{TEXT_HERE}")),
-    r"\begin{{proof}}\n    {{{}}}\n\end{{proof}}".format(apply_text_style("{TEXT_HERE}")),
+    r"\begin{{theorem}}\n    {{{}}}\n\end{{theorem}}".format(apply_text_style(random.choice(text_pool))),
+    r"\begin{{proof}}\n    {{{}}}\n\end{{proof}}".format(apply_text_style(random.choice(text_pool))),
     r"\begin{{theorem}}\n    {{{}}}\n    \begin{{proof}}\n        {{{}}}\n    \end{{proof}}\n\end{{theorem}}".format(
-        apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}")
+        apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool))
     ),
-    r"\begin{{lemma}}\n    {{{}}}\n\end{{lemma}}".format(apply_text_style("{TEXT_HERE}")),
-    r"\begin{{proposition}}\n    {{{}}}\n\end{{proposition}}".format(apply_text_style("{TEXT_HERE}")),
+    r"\begin{{lemma}}\n    {{{}}}\n\end{{lemma}}".format(apply_text_style(random.choice(text_pool))),
+    r"\begin{{proposition}}\n    {{{}}}\n\end{{proposition}}".format(apply_text_style(random.choice(text_pool))),
 
     # 46-50: Miscellaneous
     r"\textbf{{{}}}\n{{{}}}".format(
-        apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}")
+        apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool))
     ),
     r"\textit{{{}}}\n\begin{{center}}\n    {{{}}}\n\end{{center}}".format(
-        apply_text_style("{TEXT_HERE}"), apply_text_style("{TEXT_HERE}")
+        apply_text_style(random.choice(text_pool)), apply_text_style(random.choice(text_pool))
     ),
-    r"\begin{{flushleft}}\n    {{{}}}\n\end{{flushleft}}".format(apply_text_style("{TEXT_HERE}")),
-    r"\begin{{flushright}}\n    {{{}}}\n\end{{flushright}}".format(apply_text_style("{TEXT_HERE}")),
-    r"\begin{{quote}}\n    {{{}}}\n\end{{quote}}".format(apply_text_style("{TEXT_HERE}"))
+    r"\begin{{flushleft}}\n    {{{}}}\n\end{{flushleft}}".format(apply_text_style(random.choice(text_pool))),
+    r"\begin{{flushright}}\n    {{{}}}\n\end{{flushright}}".format(apply_text_style(random.choice(text_pool))),
+    r"\begin{{quote}}\n    {{{}}}\n\end{{quote}}".format(apply_text_style(random.choice(text_pool)))
     ]
 
     # Verify we have at least 50 structures
@@ -227,9 +248,9 @@ def generate_random_template(output_path):
     \date{{{}}}
     \maketitle
     """.format(
-            apply_text_style("{TEXT_HERE}"),
-            apply_text_style("{TEXT_HERE}"),
-            apply_text_style("{TEXT_HERE}")
+            apply_text_style(random.choice(text_pool)),
+            apply_text_style(random.choice(text_pool)),
+            apply_text_style(random.choice(text_pool))
         ) + content + r"""
     \end{{document}}
     """,
@@ -242,7 +263,7 @@ def generate_random_template(output_path):
     \geometry{{a4paper}}
     \begin{{document}}
     \chapter{{{}}}
-    """.format(apply_text_style("{TEXT_HERE}")) + content + r"""
+    """.format(apply_text_style(random.choice(text_pool))) + content + r"""
     \end{{document}}
     """,
 
@@ -258,8 +279,8 @@ def generate_random_template(output_path):
     \fancyhead[R]{{{}}}
     \begin{{document}}
     """.format(
-            apply_text_style("{TEXT_HERE}"),
-            apply_text_style("{TEXT_HERE}")
+            apply_text_style(random.choice(text_pool)),
+            apply_text_style(random.choice(text_pool))
         ) + content + r"""
     \end{{document}}
     """,
@@ -312,7 +333,7 @@ def generate_random_template(output_path):
     \title{{{}}}
     \maketitle
     \mainmatter
-    """.format(apply_text_style("{TEXT_HERE}")) + content + r"""
+    """.format(apply_text_style(random.choice(text_pool))) + content + r"""
     \end{{document}}
     """,
 
@@ -329,8 +350,8 @@ def generate_random_template(output_path):
     \end{{thebibliography}}
     \end{{document}}
     """.format(
-            apply_text_style("{TEXT_HERE}"),
-            apply_text_style("{TEXT_HERE}")
+            apply_text_style(random.choice(text_pool)),
+            apply_text_style(random.choice(text_pool))
         ),
 
         # 12: Minimal class
@@ -352,15 +373,15 @@ def generate_random_template(output_path):
     \begin{{letter}}{{{}}}
     \opening{{{}}}
     """.format(
-            apply_text_style("{TEXT_HERE}"),
-            apply_text_style("{TEXT_HERE}"),
-            apply_text_style("{TEXT_HERE}"),
-            apply_text_style("{TEXT_HERE}")
+            apply_text_style(random.choice(text_pool)),
+            apply_text_style(random.choice(text_pool)),
+            apply_text_style(random.choice(text_pool)),
+            apply_text_style(random.choice(text_pool))
         ) + content + r"""
     \closing{{{}}}
     \end{{letter}}
     \end{{document}}
-    """.format(apply_text_style("{TEXT_HERE}")),
+    """.format(apply_text_style(random.choice(text_pool))),
 
         # 14: Article with boxed title
         r"""
@@ -370,7 +391,7 @@ def generate_random_template(output_path):
     \geometry{{a4paper}}
     \begin{{document}}
     \fbox{{\textbf{{{}}}}}
-    """.format(apply_text_style("{TEXT_HERE}")) + content + r"""
+    """.format(apply_text_style(random.choice(text_pool))) + content + r"""
     \end{{document}}
     """,
 
@@ -404,7 +425,7 @@ def generate_random_template(output_path):
     \geometry{{a4paper}}
     \begin{{document}}
     \chapter{{{}}}
-    """.format(apply_text_style("{TEXT_HERE}")) + content + r"""
+    """.format(apply_text_style(random.choice(text_pool))) + content + r"""
     \end{{document}}
     """,
 
@@ -420,8 +441,8 @@ def generate_random_template(output_path):
     \fancyfoot[C]{{{}}}
     \begin{{document}}
     """.format(
-            apply_text_style("{TEXT_HERE}"),
-            apply_text_style("{TEXT_HERE}")
+            apply_text_style(random.choice(text_pool)),
+            apply_text_style(random.choice(text_pool))
         ) + content + r"""
     \end{{document}}
     """,
@@ -446,7 +467,7 @@ def generate_random_template(output_path):
     \usepackage{{geometry}}
     \geometry{{a4paper}}
     \begin{{document}}
-    """.format(apply_text_style("{TEXT_HERE}")) + content + r"""
+    """.format(apply_text_style(random.choice(text_pool))) + content + r"""
     \end{{document}}
     """,
 
@@ -468,7 +489,7 @@ def generate_random_template(output_path):
     \begin{{document}}
     \begin{{frame}}
     \frametitle{{{}}}
-    """.format(apply_text_style("{TEXT_HERE}")) + content + r"""
+    """.format(apply_text_style(random.choice(text_pool))) + content + r"""
     \end{{frame}}
     \end{{document}}
     """,
@@ -483,7 +504,7 @@ def generate_random_template(output_path):
     \begin{{abstract}}
     {{{}}}
     \end{{abstract}}
-    """.format(apply_text_style("{TEXT_HERE}")) + content + r"""
+    """.format(apply_text_style(random.choice(text_pool))) + content + r"""
     \end{{document}}
     """,
 
@@ -524,7 +545,7 @@ def generate_random_template(output_path):
     \begin{{sideways}}
     {{{}}}
     \end{{sideways}}
-    """.format(apply_text_style("{TEXT_HERE}")) + content + r"""
+    """.format(apply_text_style(random.choice(text_pool))) + content + r"""
     \end{{document}}
     """,
 
@@ -577,7 +598,7 @@ def generate_random_template(output_path):
     \appendix
     \section{{{}}}
     \end{{document}}
-    """.format(apply_text_style("{TEXT_HERE}"))
+    """.format(apply_text_style(random.choice(text_pool)))
     ]
 
 
@@ -592,10 +613,27 @@ def generate_random_template(output_path):
         f.write(template)
 
 def main():
-    parser = argparse.ArgumentParser(description="Generate a random LaTeX template.")
-    parser.add_argument("output_path", help="Path to save the .tex file")
+    parser = argparse.ArgumentParser(description="Generate random LaTeX templates.")
+    parser.add_argument("--input-dir",
+                        default="../deliverables/D2/BanConvComm/",
+                        help="Where to read your JSONs from")
+    parser.add_argument("--output-dir",
+                        default=".",
+                        help="Where to write .tex files")
+    parser.add_argument("--count", "-n", type=int, default=1,
+                        help="How many templates to generate")
     args = parser.parse_args()
-    generate_random_template(args.output_path)
+
+    pool = load_texts_from(args.input_dir)
+    os.makedirs(args.output_dir, exist_ok=True)
+    for i in range(1, args.count + 1):
+        out = os.path.join(args.output_dir, f"template_{i}.tex")
+        generate_random_template(out, pool)
 
 if __name__ == "__main__":
     main()
+
+''' 
+python template_generator.py --input-dir ../deliverables/D2/BanConvComm/ --output-dir ../output/ --count 5
+
+'''
